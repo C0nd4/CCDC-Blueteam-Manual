@@ -173,7 +173,8 @@ other systems
 
     `> net use`
 
-3. List the open SMB sessions with this machine:
+3. List the open SMB sessions with this machine
+   
    `> net session`
 
 4. Audit running processes

@@ -33,32 +33,37 @@ As soon as you gain access to your new machines during the competition, every si
 1. Change **all** user passwords. *Yes, especially the credentials given to you!*
 
     `# passwd username`
-2. Remove all SSH keys present on the box.
+
+2. Audit /etc/shadow for users with passwords set, or no password at all.
+
+    `cat /etc/shadow`
+
+3. Remove all SSH keys present on the box.
 
     `# find / -name authorized_keys 2> /dev/null`
 
     `# find / -name id_rsa 2> /dev/null`
-3. Audit sudo access given to users.
+4. Audit sudo access given to users.
 
     `# cat /etc/sudoers`
 
     `# cat /etc/sudoers.d/*`
 
     `# getent group sudo | cut -d: -f4` (The *sudo* group is Debian, *wheel* is for RHEL)
-4. Audit /etc/passwd to check for account shells and UIDs.
+5. Audit /etc/passwd to check for account shells and UIDs.
 
     `$ cat /etc/passwd | grep :0:`
 
     `$ cat /etc/passwd | grep -v /bin/false | grep -v /sbin/nologin`
-5. Verify that there are not any non-standard cron jobs on the system.
+6. Verify that there are not any non-standard cron jobs on the system.
 
     `# cat /etc/cron.d/*`
 
     `# for user in $(cut -f1 -d: /etc/passwd); do crontab -u $user -l; done`
-6. Remove packages that could be used for malicious purposes if not needed.
+7. Remove packages that could be used for malicious purposes if not needed.
 
     `# apt remove socat nc ncat nmap netcat` (*apt* is for Debian, *yum* is for RHEL). Other packages must be manually inspected in order to prevent taking down critical services.
-7. Stop services that are not critical to the system or competition needs.
+8. Stop services that are not critical to the system or competition needs.
 
     `# systemctl --type=service --state=active`
 
@@ -69,11 +74,15 @@ As soon as you gain access to your new machines during the competition, every si
 
     `# find / -perm -2000 -print 2>/dev/null` for SGID
 
-9. Identify world-writable files and directories.
+10. Identify world-writable files and directories.
 
     `# find / -type d \( -perm -g+w -or -perm -o+w \) -exec ls -adl {} \;` for directories
 
     `# find / ! -path "*/proc/*" -perm -2 -type f -print 2>/dev/null` for files
+
+11. Check who is currently logged into the machine.
+    
+    `$ who`
 
 #### Additional Resources
 
@@ -91,7 +100,7 @@ As soon as you gain access to your new machines during the competition, every si
 
     `> net user <username> <password>` NOTE: If domain user, append `/domain`
 
-2. Audit important groups
+2. Audit important groups.
 
     `> net localgroup Administrators`
 
@@ -99,7 +108,7 @@ As soon as you gain access to your new machines during the competition, every si
 
     `> net localgroup "Remote Management Users"`
 
-3. Disable WinRM if not needed
+3. Disable WinRM if not needed.
     
     `PS> Disable-PSRemoting -Force`
 
@@ -107,35 +116,39 @@ As soon as you gain access to your new machines during the competition, every si
 
     `> regedit.exe`  HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender
 
-5. Check for tasks set to run through the registry
+5. Check for tasks set to run through the registry.
 
     - HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run
     - HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunOnce
     - HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunServices
     - HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunServicesOnce
 
-6. Check system and user startup folder
+6. Check system and user startup folder.
     
     - User: C:\Users\USERNAME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\
     - System: C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\
 
-7. Audit scheduled tasks
+7. Audit scheduled tasks.
 
     `> schtasks`
 
-8. Check PowerShell Execution policy
+8. Check PowerShell Execution policy.
 
     `PS> Get-ExecutionPolicy`
 
     `PS> Set-ExecutionPolicy -ExecutionPolicy Restricted -Scope LocalMachine`
 
-9. Check Windows Defender status
+9. Check Windows Defender status.
 
     `PS> Get-MPComputerStatus`
 
-10. Audit SMB shares
+10. Audit SMB shares.
 
     `> net view \\127.0.0.1`
+
+11. Disable Guest account.
+
+    `> net user guest /active no`
 
 #### Additional Resources
 
@@ -160,7 +173,7 @@ As soon as you gain access to your new machines during the competition, every si
     
     `# ps aux`
 
-3. Monitor logs in `/var/log`
+3. Monitor logs in `/var/log/`
 
 ### Windows
 
